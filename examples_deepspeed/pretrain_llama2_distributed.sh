@@ -28,16 +28,16 @@ NODE_RANK=0
 # SEQ_LENGTH=2048
 # NUM_KV_HEADS=4 # llama2 70B uses GQA
 
-HIDDEN_SIZE=1024 # e.g. llama-13b: 5120
-FFN_HIDDEN_SIZE=2048 # e.g. llama-13b: 13824
-NUM_LAYERS=12 # e.g. llama-13b: 40
-NUM_HEADS=8 # e.g. llama-13b: 40
+HIDDEN_SIZE=2048 # e.g. llama-13b: 5120
+FFN_HIDDEN_SIZE=5376 # e.g. llama-13b: 13824
+NUM_LAYERS=20 # e.g. llama-13b: 40
+NUM_HEADS=32 # e.g. llama-13b: 40
 SEQ_LENGTH=2048
-NUM_KV_HEADS=4 # llama2 70B uses GQA
+NUM_KV_HEADS=32 # llama2 70B uses GQA
 
-MICRO_BATCH_SIZE=4
-GLOBAL_BATCH_SIZE=32 # e.g. llama: 4M tokens
-TRAIN_STEPS=250000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
+MICRO_BATCH_SIZE=8
+GLOBAL_BATCH_SIZE=512 # e.g. llama: 4M tokens
+TRAIN_STEPS=20000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
 LR=3e-4
 MIN_LR=3e-5
 LR_WARMUP_STEPS=2000
