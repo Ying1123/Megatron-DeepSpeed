@@ -9,9 +9,9 @@ DS_CONFIG=${BASE_PATH}/deepspeed.json
 DATASET_1="./tmp/megatron_test_text_sentence"
 DATASET="1 ${DATASET_1}"
 CHECKPOINT_PATH=./tmp
-TOKENIZER_PATH=./tmp/tokenizer.model # offical llama tokenizer.model
+TOKENIZER_PATH=./tmp/tokenizer.model
 
-TP=2
+TP=1
 PP=1
 ZERO_STAGE=0
 
@@ -21,41 +21,21 @@ MASTER_PORT=6000
 NNODES=1
 NODE_RANK=0
 
-# HIDDEN_SIZE=2048 # e.g. llama-13b: 5120
-# FFN_HIDDEN_SIZE=5504 # e.g. llama-13b: 13824
-# NUM_LAYERS=24 # e.g. llama-13b: 40
-# NUM_HEADS=16 # e.g. llama-13b: 40
-# SEQ_LENGTH=2048
-# NUM_KV_HEADS=4 # llama2 70B uses GQA
-
-HIDDEN_SIZE=2048 # e.g. llama-13b: 5120
-FFN_HIDDEN_SIZE=5376 # e.g. llama-13b: 13824
-NUM_LAYERS=20 # e.g. llama-13b: 40
-NUM_HEADS=32 # e.g. llama-13b: 40
+HIDDEN_SIZE=2048
+FFN_HIDDEN_SIZE=5376
+NUM_LAYERS=20
+NUM_HEADS=32
 SEQ_LENGTH=2048
-NUM_KV_HEADS=32 # llama2 70B uses GQA
+NUM_KV_HEADS=32
 
 MICRO_BATCH_SIZE=8
-GLOBAL_BATCH_SIZE=512 # e.g. llama: 4M tokens
-TRAIN_STEPS=20000 # e.g. llama: 1T tokens / 4M tokens_per_batch = 250000 steps
+GLOBAL_BATCH_SIZE=512
+TRAIN_STEPS=20000
 LR=3e-4
 MIN_LR=3e-5
 LR_WARMUP_STEPS=2000
 WEIGHT_DECAY=0.1
 GRAD_CLIP=1
-
-# Below configuration required for llama model as per llama paper
-# --no-query-key-layer-scaling \
-# --attention-dropout 0 \
-# --hidden-dropout 0 \
-# --use-rotary-position-embeddings \
-# --untie-embeddings-and-output-weights \
-# --swiglu \
-# --normalization rmsnorm \
-# --disable-bias-linear \
-######################################
-
-
 
 cat <<EOT > $DS_CONFIG
 {
@@ -76,7 +56,6 @@ ds_args=" --deepspeed ${ds_args}"
 ds_args=" --deepspeed_config=$DS_CONFIG ${ds_args}"
 ds_args=" --zero-stage=$ZERO_STAGE ${ds_args}"
 ds_args=" --deepspeed-activation-checkpointing ${ds_args}"
-
 
 DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE --nnodes $NNODES --node_rank $NODE_RANK --master_addr $MASTER_ADDR --master_port $MASTER_PORT"
 
@@ -124,4 +103,6 @@ torchrun $DISTRIBUTED_ARGS \
        --normalization rmsnorm \
        --disable-bias-linear \
        --num-key-value-heads $NUM_KV_HEADS \
+       --use-flash-attn \
+       --use-distributed-optimizer \
        $ds_args
